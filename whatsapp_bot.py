@@ -2,25 +2,40 @@ from flask import Flask, request
 import sqlite3
 import requests
 import os
+from google import genai
 
 app = Flask(__name__)
 
-VERIFY_TOKEN = "mera_secret_token_123"
-ACCESS_TOKEN = "EAAPzqf56J8YBSWFcfrtEfODcPdeTMkkK7dZBCoZB9OKZCeTBcSYnGwXzxWvbtnAkY4JZCktXLQBm6exxPi1ECTYvfdTmbeZBfMfZBGqSZAZCXIw0rx3HCZCyi4gxdVbMTnZBciq8LhzVU6Fe9ik657wHy8XNK0G0BCZB2rnRF0VGUYZAxsZBZBLHAm0F8Xw25qvS43c5ximAZDZD"
-PHONE_NUMBER_ID = "1243326385539260"
+VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 connection = sqlite3.connect("employees.db", check_same_thread=False)
 cursor = connection.cursor()
 
-def employee_info(sawal):
-    sawal = sawal.lower()
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+
+def employee_info_with_ai(sawal):
     cursor.execute("SELECT name, department, salary FROM employees")
     all_employees = cursor.fetchall()
-    for emp in all_employees:
-        emp_naam, emp_dept, emp_salary = emp
-        if emp_naam.lower() in sawal:
-            return f"Department: {emp_dept}, Salary: {emp_salary}"
-    return "Yeh employee hamare paas nahi hai."
+
+    employee_list = "\n".join(
+        [f"{name}: department={dept}, salary={salary}" for name, dept, salary in all_employees]
+    )
+
+    prompt = f"""Tum ek HR assistant ho. Yeh humare employees ka data hai:
+{employee_list}
+
+User ka sawal: {sawal}
+
+Is data ke basis par, user ke sawal ka Roman Urdu mein natural, friendly jawab do. Agar employee na mile to bata do. Jawab chota aur seedha rakho."""
+
+    response = gemini_client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt
+    )
+    return response.text
 
 def send_whatsapp_message(to_number, message_text):
     url = f"https://graph.facebook.com/v21.0/{PHONE_NUMBER_ID}/messages"
@@ -59,7 +74,7 @@ def receive_message():
         from_number = message["from"]
         text = message["text"]["body"]
 
-        jawab = employee_info(text)
+        jawab = employee_info_with_ai(text)
         send_whatsapp_message(from_number, jawab)
     except (KeyError, IndexError):
         pass
