@@ -5,6 +5,7 @@ import os
 from google import genai
 
 app = Flask(__name__)
+
 VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "").strip()
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "").strip()
 PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID", "").strip()
@@ -18,37 +19,15 @@ gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 def employee_info_with_ai(sawal):
     cursor.execute("SELECT name, department, salary FROM employees")
     all_employees = cursor.fetchall()
-
-    employee_list = "\n".join(
-        [f"{name}: department={dept}, salary={salary}" for name, dept, salary in all_employees]
-    )
-
-    prompt = f"""Tum ek HR assistant ho. Yeh humare employees ka data hai:
-{employee_list}
-
-User ka sawal: {sawal}
-
-Is data ke basis par, user ke sawal ka Roman Urdu mein natural, friendly jawab do. Agar employee na mile to bata do. Jawab chota aur seedha rakho."""
-
- 
-response = gemini_client.models.generate_content(
-        model="gemini-2.0-flash-lite",
-        contents=prompt
-    )
+    employee_list = "\n".join([f"{name}: department={dept}, salary={salary}" for name, dept, salary in all_employees])
+    prompt = "Tum ek HR assistant ho. Yeh humare employees ka data hai:\n" + employee_list + "\n\nUser ka sawal: " + sawal + "\n\nIs data ke basis par, user ke sawal ka Roman Urdu mein natural, friendly jawab do. Agar employee na mile to bata do. Jawab chota aur seedha rakho."
+    response = gemini_client.models.generate_content(model="gemini-2.0-flash-lite", contents=prompt)
     return response.text
 
 def send_whatsapp_message(to_number, message_text):
-    url = f"https://graph.facebook.com/v21.0/{PHONE_NUMBER_ID}/messages"
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "messaging_product": "whatsapp",
-        "to": to_number,
-        "type": "text",
-        "text": {"body": message_text}
-    }
+    url = "https://graph.facebook.com/v21.0/" + PHONE_NUMBER_ID + "/messages"
+    headers = {"Authorization": "Bearer " + ACCESS_TOKEN, "Content-Type": "application/json"}
+    data = {"messaging_product": "whatsapp", "to": to_number, "type": "text", "text": {"body": message_text}}
     response = requests.post(url, headers=headers, json=data)
     print("WhatsApp API Response:", response.status_code, response.text)
 
@@ -73,7 +52,6 @@ def receive_message():
         message = entry["messages"][0]
         from_number = message["from"]
         text = message["text"]["body"]
-
         jawab = employee_info_with_ai(text)
         send_whatsapp_message(from_number, jawab)
     except (KeyError, IndexError):
