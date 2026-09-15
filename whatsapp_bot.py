@@ -1,4 +1,3 @@
-from flask import Flask, request
 import sqlite3
 import requests
 import os
@@ -34,7 +33,8 @@ def send_whatsapp_message(to_number, message_text):
         "type": "text",
         "text": {"body": message_text}
     }
-    requests.post(url, headers=headers, json=data)
+    response = requests.post(url, headers=headers, json=data)
+    print("WhatsApp API Response:", response.status_code, response.text)
 
 @app.route("/")
 def home():
