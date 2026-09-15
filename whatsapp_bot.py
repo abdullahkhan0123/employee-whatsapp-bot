@@ -21,7 +21,8 @@ def employee_info_with_ai(sawal):
     all_employees = cursor.fetchall()
     employee_list = "\n".join([f"{name}: department={dept}, salary={salary}" for name, dept, salary in all_employees])
     prompt = "Tum ek HR assistant ho. Yeh humare employees ka data hai:\n" + employee_list + "\n\nUser ka sawal: " + sawal + "\n\nIs data ke basis par, user ke sawal ka Roman Urdu mein natural, friendly jawab do. Agar employee na mile to bata do. Jawab chota aur seedha rakho."
-       response = gemini_client.models.generate_content(model="gemini-3.5-flash-lite", contents=prompt)
+    response = gemini_client.models.generate_content(model="gemini-3.5-flash-lite", contents=prompt)
+    return response.text
 
 def send_whatsapp_message(to_number, message_text):
     url = "https://graph.facebook.com/v21.0/" + PHONE_NUMBER_ID + "/messages"
