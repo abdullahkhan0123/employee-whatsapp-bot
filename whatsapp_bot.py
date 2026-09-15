@@ -30,8 +30,9 @@ User ka sawal: {sawal}
 
 Is data ke basis par, user ke sawal ka Roman Urdu mein natural, friendly jawab do. Agar employee na mile to bata do. Jawab chota aur seedha rakho."""
 
-    response = gemini_client.models.generate_content(
-        model="gemini-3.6-flash",
+ 
+response = gemini_client.models.generate_content(
+        model="gemini-2.0-flash-lite",
         contents=prompt
     )
     return response.text
