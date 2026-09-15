@@ -5,11 +5,10 @@ import os
 from google import genai
 
 app = Flask(__name__)
-
-VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
-PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID")
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "").strip()
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "").strip()
+PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID", "").strip()
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 
 connection = sqlite3.connect("employees.db", check_same_thread=False)
 cursor = connection.cursor()
