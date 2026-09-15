@@ -20,7 +20,7 @@ def employee_info_with_ai(sawal):
     cursor.execute("SELECT name, department, salary FROM employees")
     all_employees = cursor.fetchall()
     employee_list = "\n".join([f"{name}: department={dept}, salary={salary}" for name, dept, salary in all_employees])
-    prompt = "Tum ek HR assistant ho. Yeh humare employees ka data hai:\n" + employee_list + "\n\nUser ka sawal: " + sawal + "\n\nIs data ke basis par, user ke sawal ka Roman Urdu mein natural, friendly jawab do. Agar employee na mile to bata do. Jawab chota aur seedha rakho."
+    prompt = "Tum ek friendly HR assistant chatbot ho. Agar user salam, hi, hello, ya koi general baat kare, to usay friendly tareeke se jawab do, koi employee data zaroori nahi. Agar user kisi employee ke baare mein poochhe, to yeh data use karo:\n" + employee_list + "\n\nUser ka message: " + sawal + "\n\nRoman Urdu mein, chota, natural aur friendly jawab do."
     response = gemini_client.models.generate_content(model="gemini-3.5-flash-lite", contents=prompt)
     return response.text
 
