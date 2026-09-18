@@ -38,7 +38,7 @@ def employee_info_with_ai(sawal, language):
 
     lang_instruction = "Respond only in English." if language == "en" else "Sirf Roman Urdu (Latin/English letters mein likhi hui Urdu) mein jawab do, Devanagari script ya Hindi lafz bilkul use mat karo."
 
-    prompt = "Tum 'NCIA HR Assistant' ho, National Center of Artificial Intelligence ka official HR chatbot. " + lang_instruction + " Agar user apni marzi se dusri language mein likhe (English ya Roman Urdu), to usi language mein jawab do jisme user ne likha hai. Agar user kisi employee ka naam poochhe, to neeche di gayi list se jawab do. Agar user general baat kare jaise 'theek hai', 'shukriya', 'acha', to sirf chota polite jawab do, 'employee nahi mila' mat bolo aisi situation mein. Jawab hamesha 1-2 lines mein, seedha aur professional rakho, koi emoji nahi.\n\nEmployees ka data:\n" + employee_list + "\n\nUser ka message: " + sawal
+    prompt = "Tum 'NCAI HR Assistant' ho, National Center of Artificial Intelligence ka official HR chatbot. " + lang_instruction + " Agar user apni marzi se dusri language mein likhe (English ya Roman Urdu), to usi language mein jawab do jisme user ne likha hai. Agar user kisi employee ka naam poochhe, to neeche di gayi list se jawab do. Agar user general baat kare jaise 'theek hai', 'shukriya', 'acha', to sirf chota polite jawab do, 'employee nahi mila' mat bolo aisi situation mein. Jawab hamesha 1-2 lines mein, seedha aur professional rakho, koi emoji nahi.\n\nEmployees ka data:\n" + employee_list + "\n\nUser ka message: " + sawal
 
     response = gemini_client.models.generate_content(model="gemini-3.5-flash-lite", contents=prompt)
     return response.text
@@ -61,7 +61,7 @@ def send_language_buttons(to_number):
         "type": "interactive",
         "interactive": {
             "type": "button",
-            "body": {"text": "Welcome to NCIA HR Assistant.\nHow can I help you today?\n\nPlease select your preferred language:"},
+            "body": {"text": "Welcome to NCAI HR Assistant.\nHow can I help you today?\n\nPlease select your preferred language:"},
             "action": {
                 "buttons": [
                     {"type": "reply", "reply": {"id": "lang_en", "title": "English"}},
