@@ -36,9 +36,9 @@ def employee_info_with_ai(sawal, language):
     all_employees = cursor.fetchall()
     employee_list = "\n".join([f"{name}: department={dept}, salary={salary}" for name, dept, salary in all_employees])
 
-    lang_instruction = "Respond in English." if language == "en" else "Roman Urdu mein jawab do."
+    lang_instruction = "Respond only in English." if language == "en" else "Sirf Roman Urdu (Latin/English letters mein likhi hui Urdu) mein jawab do, Devanagari script ya Hindi lafz bilkul use mat karo."
 
-    prompt = "Tum 'NCIA HR Assistant' ho, National Center of Artificial Intelligence ka official HR chatbot. Sirf employee ki maloomat (naam, department, salary) do, sirf jo poocha jaye wahi batao. Kisi general topic par baat mat karo. Jawab hamesha 1-2 lines mein, seedha aur professional rakho, koi emoji nahi. " + lang_instruction + " Agar user jis language mein likhe usi mein jawab do, chahe unhone pehle koi aur language select ki ho.\n\nEmployees ka data:\n" + employee_list + "\n\nUser ka message: " + sawal
+    prompt = "Tum 'NCIA HR Assistant' ho, National Center of Artificial Intelligence ka official HR chatbot. " + lang_instruction + " Agar user apni marzi se dusri language mein likhe (English ya Roman Urdu), to usi language mein jawab do jisme user ne likha hai. Agar user kisi employee ka naam poochhe, to neeche di gayi list se jawab do. Agar user general baat kare jaise 'theek hai', 'shukriya', 'acha', to sirf chota polite jawab do, 'employee nahi mila' mat bolo aisi situation mein. Jawab hamesha 1-2 lines mein, seedha aur professional rakho, koi emoji nahi.\n\nEmployees ka data:\n" + employee_list + "\n\nUser ka message: " + sawal
 
     response = gemini_client.models.generate_content(model="gemini-3.5-flash-lite", contents=prompt)
     return response.text
@@ -65,7 +65,7 @@ def send_language_buttons(to_number):
             "action": {
                 "buttons": [
                     {"type": "reply", "reply": {"id": "lang_en", "title": "English"}},
-                    {"type": "reply", "reply": {"id": "lang_ur", "title": "Urdu"}}
+                    {"type": "reply", "reply": {"id": "lang_ur", "title": "Roman Urdu"}}
                 ]
             }
         }
@@ -104,7 +104,7 @@ def receive_message():
                 send_whatsapp_message(from_number, "Language set to English. How can I help you?")
             elif button_id == "lang_ur":
                 set_user_language(from_number, "ur")
-                send_whatsapp_message(from_number, "Zaban Urdu set ho gayi hai. Mein aapki kya madad kar sakta hoon?")
+                send_whatsapp_message(from_number, "Roman Urdu set ho gayi hai. Mein aapki kya madad kar sakta hoon?")
             return "OK", 200
 
         text = message["text"]["body"]
